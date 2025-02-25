@@ -3,14 +3,21 @@ import ReactLogo from "./logo.png"; // Import the image
 import CartIcon from "./CartIcon.js";
 import ThemeContext from "../contexts/ThemeContext.js";
 import { useTheme } from "../contexts/ThemeContextHook.js";
+import useAuthStore from "../store/AuthStore.ts";
+import {useShallow} from "zustand/react/shallow";
 
 function Header({ setPage }) {
   const [isDropdownOpen, setIsDropDownOpen] = useState(false);
+  const { isAuthenticated, login, disconnect } = useAuthStore(
+      useShallow((state) => ({
+        isAuthenticated: state.isLogged,
+        login: state.login,
+        disconnect: state.disconnect,
+      })),
+  );
 
   // const {theme} = useContext(ThemeContext);
   const { theme } = useTheme();
-  const isAuthenticated = false;
-  const user = {};
 
   const handleToggleDropdown = () => {
     setIsDropDownOpen(!isDropdownOpen);
@@ -20,7 +27,7 @@ function Header({ setPage }) {
     setPage('login-page');
   };
   const handleLogout = () => {
- 
+    disconnect();
   };
   const handleGoToHomePage = () => {
     setPage("products-page")
@@ -39,7 +46,7 @@ function Header({ setPage }) {
           {isAuthenticated ? (
             <div className="header-user-wrapper">
               <div className="header-user-label" onClick={handleToggleDropdown}>
-                {`Bonjour ${user ? user.firstname : "Anonyme"}`}
+                {`Bonjour ${login ? login : "Anonyme"}`}
               </div>
               {isDropdownOpen && (
                 <div className="header-user-dropdown">

@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { validateEmail } from "../validators.js";
 import FieldError from "./FieldError.js";
+import useAuthStore from "../store/AuthStore.ts";
 
 function LoginForm({ handleLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const loginError = useAuthStore((state) => state.error);
+
+  console.log(loginError);
 
   const getIsFormValid = () => {
     return validateEmail(email) && password.length >= 8;
@@ -32,6 +36,9 @@ function LoginForm({ handleLogin }) {
         />
         {email && !validateEmail(email) ? (
           <FieldError>L'email n'est pas valide</FieldError>
+        ) : null}
+        {loginError !== undefined ? (
+          <FieldError>{loginError}</FieldError>
         ) : null}
       </div>
       <div className="form-field">

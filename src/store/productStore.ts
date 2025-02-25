@@ -58,7 +58,7 @@ interface ProductActions {
   resetCart: () => void;
 }
 
-const productStore: StateCreator<ProductState & ProductActions>  = (set, get) => ({
+const productStore: StateCreator<ProductState & ProductActions, [["zustand/devtools", never]]>  = (set, get) => ({
   products: [],
   cartItems: [],
   getProducts: async () => {
