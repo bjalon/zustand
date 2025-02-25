@@ -17,34 +17,42 @@ import Message from "./components/Message.js";
 export default function App() {
   const [page, setPage] = useState("products-page");
   // const [ theme, setTheme ] = useState("dark");
-  const [ lang, setLang] = useState("fr");
+  const [lang, setLang] = useState("fr");
   // const [isLoading, setIsLoading] = useState(true);
-  const isLoading = useShopStore(state => state.isLoading);
-  const message = useShopStore(state => state.message);
+  const isLoading = useShopStore((state) => state.isLoading);
+  const message = useShopStore((state) => state.message);
   const getProducts = useProductStore((state) => state.getProducts);
 
-  useEffect(function () {
-    getProducts();
-    console.log("before", page)
-    setPage("ma-page");
-    console.log("after", page)
+  useEffect(() => {
+    const fetchData = async () => {
+      await getProducts();
+      console.log("before", page);
+      setPage("ma-page");
+      console.log("after", page);
+    };
+
+    fetchData().then();
   }, []);
-  
-  console.log("outside useeffect", page)
+
+  console.log("outside useeffect", page);
   return (
-    <LanguageContext.Provider value={{lang, setLang}}>
+    <LanguageContext.Provider value={{ lang, setLang }}>
       {/* <ThemeContext.Provider value={{theme, setTheme}}> */}
       <ThemeProvider>
         <div className="app">
           <Header setPage={setPage} />
           <Main>
-              {/* <Counter /> */}
-              { message && (<Message />)}
-              { isLoading ? (<BounceLoader/>) : (
-                (page === "products-page" && <ProductsPage setPage={setPage} />) ||
-                (page === "login-page" && <LoginPage />) ||
-                (page === "cart-page" && <CardPage />)
-              )}
+            {/* <Counter /> */}
+            {message && <Message />}
+            {isLoading ? (
+              <BounceLoader />
+            ) : (
+              (page === "products-page" && (
+                <ProductsPage setPage={setPage} />
+              )) ||
+              (page === "login-page" && <LoginPage />) ||
+              (page === "cart-page" && <CardPage />)
+            )}
           </Main>
           <Footer />
         </div>

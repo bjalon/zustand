@@ -1,7 +1,7 @@
-import { create, StateCreator } from 'zustand'
-import ProductService from '../services/ProductService';
-import useShopStore from './shopStore';
-import { devtools } from 'zustand/middleware';
+import { create, StateCreator } from "zustand";
+import ProductService from "../services/ProductService";
+import useShopStore from "./shopStore";
+import { devtools } from "zustand/middleware";
 
 const produitsToDisplay = [
   {
@@ -25,16 +25,16 @@ const produitsToDisplay = [
 ];
 
 interface Product {
-  id: number,
-  title: string,
-  description: string,
-  price: number,
-  image: string,
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  image: string;
   stock?: {
     quantity: {
-      value: number
-    }
-  }
+      value: number;
+    };
+  };
 }
 
 interface CartItem {
@@ -46,19 +46,22 @@ interface CartItem {
 }
 
 interface ProductState {
-  products: Product[],
-  cartItems: CartItem[]
+  products: Product[];
+  cartItems: CartItem[];
 }
 
 interface ProductActions {
-  getProducts: () => Promise<void>,
+  getProducts: () => Promise<void>;
   addToCart: (product: Product) => void;
   removeFromCart: (id: number) => void;
   updateQty: (type: "increment" | "decrement", id: number) => void;
   resetCart: () => void;
 }
 
-const productStore: StateCreator<ProductState & ProductActions, [["zustand/devtools", never]]>  = (set, get) => ({
+const productStore: StateCreator<
+  ProductState & ProductActions,
+  [["zustand/devtools", never]]
+> = (set, get) => ({
   products: [],
   cartItems: [],
   getProducts: async () => {
@@ -74,18 +77,16 @@ const productStore: StateCreator<ProductState & ProductActions, [["zustand/devto
 
       // Mettre loading à false
       // Mise à jour du store
-      set({ products: productList }, false, "productStore/getProducts")
-
-    } catch(error : any){
-      console.log(error)
+      set({ products: productList }, false, "productStore/getProducts");
+    } catch (error: any) {
+      console.log(error);
       useShopStore.getState().setMessage({
         messageText: error.message,
-        type: "error"
-      })
+        type: "error",
+      });
     } finally {
       useShopStore.getState().setIsLoading(false);
-    } 
-
+    }
   },
   addToCart: (product: Product) => {
     const productExistInCart = get().cartItems.filter(
@@ -99,9 +100,11 @@ const productStore: StateCreator<ProductState & ProductActions, [["zustand/devto
             {
               ...product,
               quantity: 0,
-            }
-          ]
-        }, false, "productStore/addToCart"
+            },
+          ],
+        },
+        false,
+        "productStore/addToCart",
       );
     }
     get().updateQty("increment", product.id);
@@ -111,7 +114,9 @@ const productStore: StateCreator<ProductState & ProductActions, [["zustand/devto
     set(
       {
         cartItems: get().cartItems.filter((item) => item.id != id),
-      }, false, "productStore/removeFromCart"
+      },
+      false,
+      "productStore/removeFromCart",
     );
     get().updateQty("decrement", id);
     console.log("Le produit a été retiré");
@@ -123,8 +128,10 @@ const productStore: StateCreator<ProductState & ProductActions, [["zustand/devto
     if (type === "decrement" && item[0].quantity === 1) {
       set(
         {
-          cartItems: get().cartItems.filter((item) => item.id != id)
-        }, false, "productStore/updateQty"
+          cartItems: get().cartItems.filter((item) => item.id != id),
+        },
+        false,
+        "productStore/updateQty",
       );
     } else {
       const newQuantity: number =
@@ -136,33 +143,30 @@ const productStore: StateCreator<ProductState & ProductActions, [["zustand/devto
       console.log("The quantity has been updated");
     }
     // Update quantity for products list
-    const decrement = type === 'increment' ? -1 : 1;
-    const updatedProducts = get().products.map(product => {
-      if(product.id === id) {
+    const decrement = type === "increment" ? -1 : 1;
+    const updatedProducts = get().products.map((product) => {
+      if (product.id === id) {
         return {
           ...product,
           stock: {
             ...product.stock,
             quantity: {
               ...product?.stock?.quantity,
-              value:  (product.stock?.quantity?.value || 0)  + decrement
-            }
-          }
-        }
+              value: (product.stock?.quantity?.value || 0) + decrement,
+            },
+          },
+        };
       } else {
         return product;
       }
-    })
-    set({ products: updatedProducts }, false, "productStore/updateQty")
-    
+    });
+    set({ products: updatedProducts }, false, "productStore/updateQty");
   },
   resetCart: () => set({ cartItems: [] }, false, "productStore/resetCart"),
 });
 
 const useProductStore = create<ProductState & ProductActions>()(
-  devtools(
-    productStore
-  )
-)
+  devtools(productStore),
+);
 
 export default useProductStore;

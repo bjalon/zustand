@@ -4,6 +4,7 @@ import CartIcon from "./CartIcon.js";
 import ThemeContext from "../contexts/ThemeContext.js";
 import { useTheme } from "../contexts/ThemeContextHook.js";
 import useAuthStore from "../store/authStore.ts";
+import useProductStore from "../store/productStore.ts";
 
 function Header({ setPage }) {
   const [isDropdownOpen, setIsDropDownOpen] = useState(false);

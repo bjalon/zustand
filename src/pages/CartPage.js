@@ -1,14 +1,17 @@
 import PageLayout from "../components/PageLayout.js";
+import useProductStore from "../store/productStore.ts";
 
 function CartPage() {
-  const items = [];
+  const cartItems = useProductStore(state => state.cartItems);
+  const updateQty = useProductStore(state => state.updateQty);
+  const removeFromCart = useProductStore(state => state.removeFromCart);
 
   const subtotal =
-    items instanceof Array
-      ? items.reduce((total, item) => total + item.quantity * item.price, 0)
+    cartItems instanceof Array
+      ? cartItems.reduce((total, item) => total + item.quantity * item.price, 0)
       : 0;
   const totalQty =
-    items instanceof Array ? items.reduce((sum, i) => sum + i.quantity, 0) : 0;
+    cartItems instanceof Array ? cartItems.reduce((sum, i) => sum + i.quantity, 0) : 0;
   const tax = subtotal * 0.2; // Assuming 10% tax
   const total = subtotal + tax;
 
@@ -17,8 +20,8 @@ function CartPage() {
       titleFr={`Panier (${totalQty})`}
       titleEn={`Shopping Cart (${totalQty})`}
     >
-      {items && items.length > 0 ? (
-        items.map((item) => (
+      {cartItems && cartItems.length > 0 ? (
+        cartItems.map((item) => (
           <div key={item.id} className="cart-item-wrapper">
             <img
               src={item.image}
@@ -31,14 +34,18 @@ function CartPage() {
               <div className="cart-item-buttons">
                 <button
                   className="btn cart-item-edit-qty"
-                  onClick={() => {}}
+                  onClick={() => {
+                    updateQty("decrement", item.id)
+                  }}
                 >
                   -
                 </button>
                 <span className="cart-item-qty">{item.quantity}</span>
                 <button
                   className="btn cart-item-edit-qty"
-                  onClick={() => {}}
+                  onClick={() => {
+                    updateQty("increment", item.id)
+                  }}
                 >
                   +
                 </button>
@@ -46,7 +53,9 @@ function CartPage() {
             </div>
             <button
               className="btn cart-item-remove"
-              onClick={() => {}}
+              onClick={() => {
+                removeFromCart(item.id)
+              }}
             >
               Retirer
             </button>
